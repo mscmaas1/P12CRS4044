@@ -1,0 +1,142 @@
+##avg waiting times
+waitingtime1=SimulationDataCRS$`System 1, Waiting Times Type 1`
+waitingtime2=SimulationDataCRS$`System 1, Waiting Times Type 2`
+
+waitingtime_old=(waitingtime1+waitingtime2)/2
+avg_old=mean(waitingtime_old) 
+
+waitingtime_new=SimulationDataCRS$`System 2, Waiting Times`
+avg_new=mean(waitingtime_new)
+ 
+waitingtime_combined<-data.frame(waitingtime_old, waitingtime_new)
+boxplot_wt<-boxplot(waitingtime_combined, names=c("Old system", "New system"), main="Waiting Times", col = c("#FFE0B2", "#F57C00"), ylab="minutes")
+
+##95% confidence intervals for the means
+n=100#sample size
+sd_old=sd(waitingtime_old)
+alpha=0.05 
+margin_old=qt(1-(alpha/2), df=n-1)*(sd_old)/sqrt(n)
+lb_old=avg_old-margin_old #lowerbound
+ub_old=avg_old+margin_old #upperbound
+
+sd_new=sd(waitingtime_new)
+margin_new=qt(1-(alpha/2), df=n-1)*(sd_new)/sqrt(n)
+lb_new=avg_new-margin_new
+ub_new=avg_new+margin_new
+
+
+###max waiting times
+max_wt_p1<-SimulationDataMaxCRS$`System 1, Waiting Times Type 1`
+max_wt_p2<-SimulationDataMaxCRS$`System 1, Waiting Times Type 2`
+max_wt_old<-pmax(max_wt_p1, max_wt_p2)
+
+
+max_wt_new<-SimulationDataMaxCRS$`System 2, Waiting Times`
+max_wt<-data.frame(max_wt_old, max_wt_new)
+boxplot_wtmax<-boxplot(max_wt, names=c("Old system", "New system"), main="Maximum Waiting Times", col = c("#FFE0B2", "#F57C00"), ylab="minutes")
+
+n=100#sample size
+sd_max_old=sd(max_wt_old)
+alpha=0.05 
+margin_max_old=qt(1-(alpha/2), df=n-1)*(sd_max_old)/sqrt(n)
+lb_max_old=mean(max_wt_old)-margin_max_old #lowerbound
+ub_max_old=mean(max_wt_old)+margin_max_old #upperbound
+#CI:
+lb_max_old
+ub_max_old
+
+sd_max_new=sd(max_wt_new)
+margin_max_new=qt(1-(alpha/2), df=n-1)*(sd_max_new)/sqrt(n)
+lb_max_new=mean(max_wt_new)-margin_max_new
+ub_max_new=mean(max_wt_new)+margin_max_new
+lb_max_new
+ub_max_new
+
+
+#overtime:
+overtime_oldM1=SimulationDataCRS$`System 1, Overtime M1`
+overtime_oldM2=SimulationDataCRS$`System 1, Overtime M2`
+overtime_hosp_old=pmax(overtime_oldM1, overtime_oldM2)
+
+overtime_newM1=SimulationDataCRS$`System 2, Overtime M1`
+overtime_newM2=SimulationDataCRS$`System 2, Overtime M2`
+overtime_hosp_new=pmax(overtime_newM1, overtime_newM2)
+
+install.packages("plotly")
+library(plotly)
+fig <- plot_ly()%>% 
+  add_histogram(x =overtime_hosp_old, name = "Old System", nbinsx = 30, opacity = 0.7) %>%
+  add_histogram(x = overtime_hosp_new, name = "New System", nbinsx = 30, opacity = 0.7) %>%
+  layout(title = "Overtime of the hospital",
+         xaxis = list(title = "Overtime (minutes)"),
+         yaxis = list(title = "Frequency"))
+# Render the plot
+fig
+
+#avg overtime>0min
+sum(overtime_hosp_old>0)
+sum(overtime_hosp_new>0)
+
+mean(overtime_hosp_old)
+mean(overtime_hosp_new)
+
+n=100#sample size
+sd_ot_old=sd(overtime_hosp_old)
+alpha=0.05 
+margin_ot_old=qt(1-(alpha/2), df=n-1)*(sd_ot_old)/sqrt(n)
+lb_ot_old=mean(overtime_hosp_old)-margin_ot_old #lowerbound
+ub_ot_old=mean(overtime_hosp_old)+margin_ot_old #upperbound
+#CI:
+lb_ot_old
+ub_ot_old
+
+sd_ot_new=sd(overtime_hosp_new)
+alpha=0.05 
+margin_ot_new=qt(1-(alpha/2), df=n-1)*(sd_ot_new)/sqrt(n)
+lb_ot_new=mean(overtime_hosp_new)-margin_ot_new #lowerbound
+ub_ot_new=mean(overtime_hosp_new)+margin_ot_new #upperbound
+#CI:
+lb_ot_new
+ub_ot_new
+
+
+#idle time
+idle_time_old1=SimulationDataCRS$`System 1, Idle Time M1`
+idle_time_old2=SimulationDataCRS$`System 1, Idle Time M2`
+idle_time_new1=SimulationDataCRS$`System 2, Idle Time M1`
+idle_time_new2=SimulationDataCRS$`System 2, Idle Time M2`
+
+idle_time_old<-idle_time_old1+idle_time_old2
+idle_time_new<-idle_time_new1+idle_time_new2
+
+fig2 <- plot_ly()%>% 
+  add_histogram(x =idle_time_old, name = "Old System", nbinsx = 30, opacity = 0.7) %>%
+  add_histogram(x = idle_time_new, name = "New System", nbinsx = 30, opacity = 0.7) %>%
+  layout(title = "Total idletime of the hospital",
+         xaxis = list(title = "Idletime (minutes)"),
+         yaxis = list(title = "Frequency"))
+# Render the plot
+fig2
+
+mean(idle_time_old)
+mean(idle_time_new)
+
+sd_it_old=sd(idle_time_old)
+alpha=0.05 
+margin_it_old=qt(1-(alpha/2), df=n-1)*(sd_it_old)/sqrt(n)
+lb_it_old=mean(idle_time_old)-margin_it_old #lowerbound
+ub_it_old=mean(idle_time_old)+margin_it_old #upperbound
+#CI:
+lb_it_old
+ub_it_old
+
+
+sd_it_new=sd(idle_time_new)
+alpha=0.05 
+margin_it_new=qt(1-(alpha/2), df=n-1)*(sd_it_new)/sqrt(n)
+lb_it_new=mean(idle_time_new)-margin_it_new #lowerbound
+ub_it_new=mean(idle_time_new)+margin_it_new #upperbound
+#CI:
+lb_it_new
+ub_it_new
+
